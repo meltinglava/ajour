@@ -125,7 +125,7 @@ pub enum Interaction {
 pub enum Message {
     CachesLoaded(Result<(FingerprintCache, AddonCache)>),
     DownloadedAddon((DownloadReason, Flavor, String, Result<(), DownloadError>)),
-    Error(anyhow::Error),
+    Error(eyre::Report),
     Interaction(Interaction),
     LatestRelease(Option<utility::Release>),
     None(()),
@@ -165,7 +165,7 @@ pub enum Message {
 
 pub struct Ajour {
     state: HashMap<Mode, State>,
-    error: Option<anyhow::Error>,
+    error: Option<eyre::Report>,
     mode: Mode,
     addons: HashMap<Flavor, Vec<Addon>>,
     addons_scrollable_state: scrollable::State,
@@ -370,7 +370,7 @@ impl Application for Ajour {
             color_palette,
             &self.mode,
             &self.state,
-            &self.error,
+            self.error.as_ref(),
             &self.config,
             &self.valid_flavors,
             &mut self.settings_btn_state,
